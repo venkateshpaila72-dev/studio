@@ -187,28 +187,22 @@ export default function Home() {
     return () => clearInterval(difficultyInterval);
   }, [gameState, score]);
 
-  const handleUserInteraction = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (gameState !== 'playing') return;
-    
-    const target = e.target as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const clickY = e.clientY - rect.top;
-    
-    // Bottom half jump, top half shoot
-    if (clickY > rect.height / 2) {
-      // Jump
-      if (!isJumping) {
-        setIsJumping(true);
-        setPlayerVelocity(C.PLAYER_JUMP_VELOCITY);
-      }
-    } else {
-      // Shoot
-      setShurikens(prev => [...prev, { 
-        id: Date.now(), 
-        x: C.PLAYER_X_POSITION + C.PLAYER_WIDTH, 
-        y: playerPos.y + C.PLAYER_HEIGHT / 2 - C.SHURIKEN_HEIGHT / 2 
-      }]);
-    }
+  const handleJump = () => {
+    if (gameState !== "playing" || isJumping) return;
+    setIsJumping(true);
+    setPlayerVelocity(C.PLAYER_JUMP_VELOCITY);
+  };
+  
+  const handleShoot = () => {
+    if (gameState !== "playing") return;
+    setShurikens((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        x: C.PLAYER_X_POSITION + C.PLAYER_WIDTH,
+        y: playerPos.y + C.PLAYER_HEIGHT / 2 - C.SHURIKEN_HEIGHT / 2,
+      },
+    ]);
   };
 
   function checkCollision(rect1: any, rect2: any) {
@@ -272,15 +266,22 @@ export default function Home() {
         <h1 className="text-6xl font-headline text-primary mb-4 tracking-wider">Shadow Strike</h1>
         <div
             ref={gameContainerRef}
-            className="relative bg-background w-full max-w-4xl border-2 border-primary/50 rounded-lg shadow-2xl shadow-primary/20 overflow-hidden cursor-pointer"
+            className="relative bg-background w-full max-w-4xl border-2 border-primary/50 rounded-lg shadow-2xl shadow-primary/20 overflow-hidden"
             style={{ aspectRatio: `${C.GAME_WIDTH} / ${C.GAME_HEIGHT}` }}
-            onClick={handleUserInteraction}
         >
             {renderGameContent()}
         </div>
-        <p className="text-accent/50 mt-4 text-sm font-code">
-          Tap top half to shoot, bottom half to jump.
-        </p>
+        {gameState === 'playing' && (
+          <div className="flex gap-4 mt-4">
+            <Button onClick={handleShoot} className="font-headline text-lg px-8 py-6">Shoot</Button>
+            <Button onClick={handleJump} className="font-headline text-lg px-8 py-6">Jump</Button>
+          </div>
+        )}
+        {gameState !== 'playing' && (
+           <p className="text-accent/50 mt-4 text-sm font-code h-[52px]">
+             Use the buttons to play the game.
+           </p>
+        )}
     </main>
   );
 }
