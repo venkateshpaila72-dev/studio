@@ -97,10 +97,10 @@ export default function Home() {
     setShurikens(prev => prev.map(s => ({ ...s, x: s.x + C.SHURIKEN_SPEED * gameSpeed })).filter(s => s.x < C.GAME_WIDTH));
 
     // Move enemies
-    setEnemies(prev => prev.map(e => ({ ...e, x: e.x - 4 * gameSpeed })).filter(e => e.x > -C.ENEMY_WIDTH));
+    setEnemies(prev => prev.map(e => ({ ...e, x: e.x - C.GROUND_SPEED * gameSpeed })).filter(e => e.x > -C.ENEMY_WIDTH));
 
     // Move obstacles
-    setObstacles(prev => prev.map(o => ({ ...o, x: o.x - 4 * gameSpeed })).filter(o => o.x > -o.width));
+    setObstacles(prev => prev.map(o => ({ ...o, x: o.x - C.GROUND_SPEED * gameSpeed })).filter(o => o.x > -o.width));
 
     // Spawn enemies
     enemySpawnCounterRef.current += gameSpeed;
@@ -111,10 +111,11 @@ export default function Home() {
     
     // Spawn obstacles
     obstacleSpawnCounterRef.current += gameSpeed;
-    if (obstacleSpawnCounterRef.current > 600 / (difficulty.obstacleComplexity * 0.5)) {
-      obstacleSpawnCounterRef.current = 0;
-      const height = C.OBSTACLE_MIN_HEIGHT + Math.random() * (C.OBSTACLE_MAX_HEIGHT - C.OBSTACLE_MIN_HEIGHT) * (difficulty.obstacleComplexity / 5);
-      setObstacles(prev => [...prev, { id: Date.now(), x: C.GAME_WIDTH, y: C.GAME_HEIGHT - height, width: C.OBSTACLE_WIDTH, height }]);
+    if (obstacleSpawnCounterRef.current > 400 / difficulty.obstacleComplexity) {
+        obstacleSpawnCounterRef.current = 0;
+        const height = C.OBSTACLE_MIN_HEIGHT + Math.random() * (C.OBSTACLE_MAX_HEIGHT - C.OBSTACLE_MIN_HEIGHT);
+        const width = C.OBSTACLE_MIN_WIDTH + Math.random() * (C.OBSTACLE_MAX_WIDTH - C.OBSTACLE_MIN_WIDTH);
+        setObstacles(prev => [...prev, { id: Date.now(), x: C.GAME_WIDTH, y: C.GAME_HEIGHT - C.GROUND_HEIGHT - height, width: width, height: height }]);
     }
 
     // Collision detection
@@ -253,9 +254,12 @@ export default function Home() {
             {obstacles.map(o => (
               <div key={o.id} className="bg-primary/50 border-t-2 border-primary" style={{ position: 'absolute', left: o.x, top: o.y, width: o.width, height: o.height }} />
             ))}
-
-            <div className="absolute bottom-0 left-0 w-full h-5 bg-gradient-to-t from-background to-transparent" />
-            <div className="absolute bottom-0 left-0 w-full h-10 bg-primary/20 blur-xl" />
+            
+            <div 
+              className="absolute bottom-0 left-0 w-full bg-primary/30"
+              style={{ height: C.GROUND_HEIGHT }}
+            />
+            <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-background via-background/50 to-transparent" />
           </>
         );
     }
@@ -322,3 +326,5 @@ const GameOverScreen = ({ score, highScore, onRestart }: { score: number, highSc
     </Card>
   </motion.div>
 );
+
+    
