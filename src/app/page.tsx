@@ -216,7 +216,7 @@ export default function Home() {
     setTimeout(() => setIsStriking(false), 200);
 
     const strikeRange = {
-      x: C.PLAYER_X_POSITION,
+      x: C.PLAYER_X_POSITION + C.PLAYER_WIDTH,
       y: playerPos.y,
       width: C.STRIKE_RANGE,
       height: C.PLAYER_HEIGHT
@@ -241,8 +241,10 @@ export default function Home() {
         return true;
     });
 
-    setEnemies(remainingEnemies);
-    setObstacles(remainingObstacles);
+    if (enemies.length !== remainingEnemies.length || obstacles.length !== remainingObstacles.length) {
+      setEnemies(remainingEnemies);
+      setObstacles(remainingObstacles);
+    }
     if(scoreToAdd > 0) {
       setScore(s => s + scoreToAdd);
     }
