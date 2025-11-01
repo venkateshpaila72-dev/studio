@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NinjaIcon } from "@/components/icons/NinjaIcon";
 import { ShurikenIcon } from "@/components/icons/ShurikenIcon";
 import { EnemyIcon } from "@/components/icons/EnemyIcon";
+import { SlashIcon } from "@/components/icons/SlashIcon";
 import { adjustDifficulty, type AdaptiveDifficultyOutput } from "@/ai/flows/adaptive-difficulty-scaling";
 import * as C from "@/lib/constants";
 
@@ -22,6 +23,7 @@ export default function Home() {
   const [playerPos, setPlayerPos] = useState({ y: C.PLAYER_INITIAL_Y });
   const [playerVelocity, setPlayerVelocity] = useState(0);
   const [isJumping, setIsJumping] = useState(false);
+  const [isStriking, setIsStriking] = useState(false);
 
   const [shurikens, setShurikens] = useState<Entity[]>([]);
   const [enemies, setEnemies] = useState<Entity[]>([]);
@@ -47,6 +49,7 @@ export default function Home() {
     setPlayerPos({ y: C.PLAYER_INITIAL_Y });
     setPlayerVelocity(0);
     setIsJumping(false);
+    setIsStriking(false);
     setShurikens([]);
     setEnemies([]);
     setObstacles([]);
@@ -209,6 +212,9 @@ export default function Home() {
   const handleStrike = () => {
     if (gameState !== "playing") return;
     
+    setIsStriking(true);
+    setTimeout(() => setIsStriking(false), 200);
+
     const strikeRange = {
       x: C.PLAYER_X_POSITION,
       y: playerPos.y,
@@ -262,6 +268,26 @@ export default function Home() {
           <>
             <div className="absolute top-4 left-4 text-2xl font-headline text-accent z-10">SCORE: {score}</div>
             <div className="absolute top-4 right-4 text-2xl font-headline text-accent/80 z-10">HIGH SCORE: {highScore}</div>
+            
+            <AnimatePresence>
+              {isStriking && (
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    left: C.PLAYER_X_POSITION + C.PLAYER_WIDTH / 2,
+                    top: playerPos.y,
+                    width: C.STRIKE_RANGE,
+                    height: C.PLAYER_HEIGHT,
+                  }}
+                  initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, rotate: 45 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <SlashIcon />
+                </motion.div>
+              )}
+            </AnimatePresence>
             
             <motion.div style={{ position: 'absolute', left: C.PLAYER_X_POSITION, width: C.PLAYER_WIDTH, height: C.PLAYER_HEIGHT }} animate={{ y: playerPos.y }}>
               <NinjaIcon />
