@@ -206,6 +206,42 @@ export default function Home() {
     ]);
   };
 
+  const handleStrike = () => {
+    if (gameState !== "playing") return;
+    
+    const strikeRange = {
+      x: C.PLAYER_X_POSITION,
+      y: playerPos.y,
+      width: C.STRIKE_RANGE,
+      height: C.PLAYER_HEIGHT
+    };
+    
+    let scoreToAdd = 0;
+
+    const remainingEnemies = enemies.filter(enemy => {
+      const enemyRect = { x: enemy.x, y: enemy.y, width: C.ENEMY_WIDTH, height: C.ENEMY_HEIGHT };
+      if (checkCollision(strikeRange, enemyRect)) {
+        scoreToAdd += C.SCORE_PER_ENEMY;
+        return false;
+      }
+      return true;
+    });
+
+    const remainingObstacles = obstacles.filter(obstacle => {
+        const obstacleRect = { x: obstacle.x, y: obstacle.y, width: obstacle.width, height: obstacle.height };
+        if (checkCollision(strikeRange, obstacleRect)) {
+          return false;
+        }
+        return true;
+    });
+
+    setEnemies(remainingEnemies);
+    setObstacles(remainingObstacles);
+    if(scoreToAdd > 0) {
+      setScore(s => s + scoreToAdd);
+    }
+  };
+
   function checkCollision(rect1: any, rect2: any) {
     return (
       rect1.x < rect2.x + rect2.width &&
@@ -277,6 +313,7 @@ export default function Home() {
         </div>
         {gameState === 'playing' && (
           <div className="flex gap-4 mt-4">
+            <Button onClick={handleStrike} className="font-headline text-lg px-8 py-6">Strike</Button>
             <Button onClick={handleShoot} className="font-headline text-lg px-8 py-6">Shoot</Button>
             <Button onClick={handleJump} className="font-headline text-lg px-8 py-6">Jump</Button>
           </div>
@@ -326,5 +363,3 @@ const GameOverScreen = ({ score, highScore, onRestart }: { score: number, highSc
     </Card>
   </motion.div>
 );
-
-    

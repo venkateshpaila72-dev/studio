@@ -25,4 +25,4 @@ export const OBSTACLE_MAX_HEIGHT = 100;
 
 export const SCORE_PER_ENEMY = 100;
 
-    
+export const STRIKE_RANGE = 100;
